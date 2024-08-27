@@ -8,6 +8,7 @@ const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
+const rateLimit = require('express-rate-limit');
 const app = express();
 
 // Set up EJS as the view engine
@@ -69,6 +70,12 @@ passport.use(new GoogleStrategy({
     });
   }
 ));
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes in milliseconds
+    max: 100, // Limit to 100 requests per windowMs
+    standardHeaders: true, // Return rate limit info in the headers
+    legacyHeaders: false, // Disable the old RateLimit headers
+  });
 // Define your routes here
 app.get("/", (req, res) => {
     res.render("home");
